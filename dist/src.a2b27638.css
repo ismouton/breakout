@@ -1,5 +1,13 @@
 body {
   font-family: sans-serif;
+  background-color: black;
+}
+
+canvas {
+  display: block;
+  border: solid black thick;
+  border-radius: 16px;
+  /* filter: blur(1px); */
 }
 
 

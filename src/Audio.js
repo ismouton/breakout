@@ -1,144 +1,207 @@
 const timedDo = (fn, millis) => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      let returnValue;
-      try {
-        returnValue = fn();
-      } catch (e) {
-        reject(e);
-      }
+	return new Promise((resolve, reject) => {
+		setTimeout(() => {
+			let returnValue;
+			try {
+				returnValue = fn();
+			} catch (e) {
+				reject(e);
+			}
 
-      resolve(returnValue);
-    }, millis);
-  });
+			resolve(returnValue);
+		}, millis);
+	});
 };
 
 export default class Audio {
-  constructor() {
-    let audioCtx = window.AudioContext || window.webkitAudioContext;
-    this.audioCtx = new audioCtx();
-  }
+	constructor() {
+		let audioCtx = window.AudioContext || window.webkitAudioContext;
+		this.audioCtx = new audioCtx();
+	}
 
-  async playSilence(millis) {
-    return new Promise((resolve) => {
-      setTimeout(() => resolve(), millis);
-    });
-  }
+	async playNoise({ millis = 1000, bandHz = 600, gainValue = 0.002 } = {}) {
+		const bufferSize = this.audioCtx.sampleRate * millis; // set the time of the note
+		const buffer = this.audioCtx.createBuffer(
+			1,
+			bufferSize,
+			this.audioCtx.sampleRate
+		); // create an empty buffer
+		const data = buffer.getChannelData(0); // get data
+		const gain = this.audioCtx.createGain();
+		gain.gain.value = gainValue;
 
-  async playRing({ frequencies = [440, 480], millis = 2000, gain: gainValue = 0.03} = {}) {
-    return new Promise((resolve) => {
-      const gain = this.audioCtx.createGain();
-      gain.gain.value = gainValue;
-      const oscillators = [];
+		for (let i = 0; i < bufferSize; i++) {
+			data[i] = Math.random() * 2 - 1;
+		}
 
-      for (let i = 0; i < frequencies.length; i++) {
-        const frequency = frequencies[i];
-        const oscillator = this.audioCtx.createOscillator();
+		const noise = this.audioCtx.createBufferSource();
+		noise.buffer = buffer;
 
-        oscillator.type = "sine";
-        oscillator.frequency.value = frequency;
-        oscillator.connect(gain);
+		const bandpass = this.audioCtx.createBiquadFilter();
+		bandpass.type = "bandpass";
+		bandpass.frequency.value = bandHz;
 
-        oscillators.push(oscillator);
-      }
+		// connect our graph
+		noise.connect(bandpass).connect(gain);
+		gain.connect(this.audioCtx.destination);
+		noise.start();
+	}
 
-      gain.connect(this.audioCtx.destination);
-      
-      oscillators.forEach(o => o.start());
+	async playSilence(millis) {
+		return new Promise((resolve) => {
+			setTimeout(() => resolve(), millis);
+		});
+	}
 
-      setTimeout(() => {
-        resolve();
-        oscillators.forEach(o => o.stop());
-      }, millis);
-    });
-  }
+	async playSlide({
+		startFrequency = 440,
+		numberOfSteps,
+		stepSizeInCents = 1,
+	} = {}) {
+		return new Promise((resolve) => {
+			const oscillator = this.audioCtx.createOscillator();
+			const gain = this.audioCtx.createGain();
 
-  async playScript(script) {
-    const oscillator = this.audioCtx.createOscillator();
-    const gain = this.audioCtx.createGain();
+			oscillator.type = "square";
+			oscillator.frequency.value = startFrequency;
+			gain.gain.value = 0.03;
+			oscillator.connect(gain);
 
-    oscillator.type = "square";
-    oscillator.frequency.value = 100;
-    gain.gain.value = 0.03;
-    oscillator.connect(gain);
+			gain.connect(this.audioCtx.destination);
+			oscillator.start();
 
-    gain.connect(this.audioCtx.destination);
-    oscillator.start();
+			for (let i = 0; i < numberOfSteps; i++) {
+				oscillator.detune.setValueAtTime(
+					i * stepSizeInCents,
+					this.audioCtx.currentTime + i * 1 * 0.001
+				);
+			}
 
-    let totalTime = 0;
+			setTimeout(() => {
+				resolve();
+				oscillator.stop();
+			}, numberOfSteps);
+		});
+	}
 
-    for (let i = 0; i < script.length; i++) {
-      const [frequency, millis] = script[i];
+	async playRing({
+		frequencies = [440, 480],
+		millis = 2000,
+		gain: gainValue = 0.03,
+	} = {}) {
+		return new Promise((resolve) => {
+			const gain = this.audioCtx.createGain();
+			gain.gain.value = gainValue;
+			const oscillators = [];
 
-      oscillator.frequency.setValueAtTime(
-        frequency,
-        this.audioCtx.currentTime + totalTime * 0.001,
-      );
+			for (let i = 0; i < frequencies.length; i++) {
+				const frequency = frequencies[i];
+				const oscillator = this.audioCtx.createOscillator();
 
-      totalTime += millis;
-    }
+				oscillator.type = "sine";
+				oscillator.frequency.value = frequency;
+				oscillator.connect(gain);
 
-    setTimeout(() => oscillator.stop(), totalTime);
-  }
+				oscillators.push(oscillator);
+			}
 
-  async playPause() {
-    const oscillator = this.audioCtx.createOscillator();
-    const gain = this.audioCtx.createGain();
+			gain.connect(this.audioCtx.destination);
 
-    oscillator.type = "square";
-    oscillator.frequency.value = 100;
-    gain.gain.value = 0.03;
-    oscillator.connect(gain);
+			oscillators.forEach((o) => o.start());
 
-    gain.connect(this.audioCtx.destination);
-    oscillator.start();
+			setTimeout(() => {
+				resolve();
+				oscillators.forEach((o) => o.stop());
+			}, millis);
+		});
+	}
 
-    for (let i = 0; i < 4; i++) {
-      oscillator.detune.setValueAtTime(
-        i %2 === 0 ? 300 : -200,
-        this.audioCtx.currentTime + i * 125 * 0.001
-      );
-    }
+	async playScript(script) {
+		const oscillator = this.audioCtx.createOscillator();
+		const gain = this.audioCtx.createGain();
 
-    setTimeout(() => oscillator.stop(), 500);
-  }
+		oscillator.type = "square";
+		oscillator.frequency.value = 100;
+		gain.gain.value = 0.03;
+		oscillator.connect(gain);
 
-  playBuzz(hz, millis, { oscillationMillis = 10, buzzOffsetCents = 500 }) {
-    return new Promise((resolve) => {
-      const oscillator = this.audioCtx.createOscillator();
-      const gain = this.audioCtx.createGain();
+		gain.connect(this.audioCtx.destination);
+		oscillator.start();
 
-      oscillator.type = "square";
-      oscillator.frequency.value = hz;
-      gain.gain.value = 0.03;
-      oscillator.connect(gain);
+		let totalTime = 0;
 
-      gain.connect(this.audioCtx.destination);
-      oscillator.start();
+		for (let i = 0; i < script.length; i++) {
+			const [frequency, millis] = script[i];
 
-      const cycles = Math.ceil(millis / oscillationMillis);
-      for (let i = 0; i < cycles; i++) {
-        oscillator.detune.setValueAtTime(
-          i %2 === 0 ? buzzOffsetCents : -buzzOffsetCents,
-          this.audioCtx.currentTime + i * oscillationMillis * 0.001
-        );
-      }
+			oscillator.frequency.setValueAtTime(
+				frequency,
+				this.audioCtx.currentTime + totalTime * 0.001
+			);
 
-      setTimeout(() => {
-        resolve();
-        oscillator.stop();
-      }, millis);
-    });
-  }
+			totalTime += millis;
+		}
 
-  async playTrill(millis = 50) {
-    this.playScript([
-      [250, millis],
-      [500, millis],
-      [1000, millis],
-      [2000, millis],
-      [4000, millis],
-      [8000, millis],
-    ]);
-  }
+		setTimeout(() => oscillator.stop(), totalTime);
+	}
+
+	async playPause() {
+		const oscillator = this.audioCtx.createOscillator();
+		const gain = this.audioCtx.createGain();
+
+		oscillator.type = "square";
+		oscillator.frequency.value = 100;
+		gain.gain.value = 0.03;
+		oscillator.connect(gain);
+
+		gain.connect(this.audioCtx.destination);
+		oscillator.start();
+
+		for (let i = 0; i < 4; i++) {
+			oscillator.detune.setValueAtTime(
+				i % 2 === 0 ? 300 : -200,
+				this.audioCtx.currentTime + i * 125 * 0.001
+			);
+		}
+
+		setTimeout(() => oscillator.stop(), 500);
+	}
+
+	playBuzz(hz, millis, { oscillationMillis = 10, buzzOffsetCents = 500 } = {}) {
+		return new Promise((resolve) => {
+			const oscillator = this.auFioCtx.createOscillator();
+			const gain = this.audioCtx.createGain();
+
+			oscillator.type = "square";
+			oscillator.frequency.value = hz;
+			gain.gain.value = 0.03;
+			oscillator.connect(gain);
+
+			gain.connect(this.audioCtx.destination);
+			oscillator.start();
+
+			const cycles = Math.ceil(millis / oscillationMillis);
+			for (let i = 0; i < cycles; i++) {
+				oscillator.detune.setValueAtTime(
+					i % 2 === 0 ? buzzOffsetCents : -buzzOffsetCents,
+					this.audioCtx.currentTime + i * oscillationMillis * 0.001
+				);
+			}
+
+			setTimeout(() => {
+				resolve();
+				oscillator.stop();
+			}, millis);
+		});
+	}
+
+	async playTrill(millis = 50) {
+		this.playScript([
+			[250, millis],
+			[500, millis],
+			[1000, millis],
+			[2000, millis],
+			[4000, millis],
+			[8000, millis],
+		]);
+	}
 }
