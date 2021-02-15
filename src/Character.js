@@ -10,7 +10,6 @@ class Character {
 		 */
 		audio,
 
-
 		/**
 		 * Starting X coordinate.
 		 */
@@ -35,7 +34,7 @@ class Character {
 			);
 		}
 
-                this._x = x;
+		this._x = x;
 		this._y = y;
 		this.audio = audio;
 		this.video = video;

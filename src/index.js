@@ -2,6 +2,7 @@ import "./styles.css";
 import Audio from "./Audio";
 import Video from "./Video";
 import Paddle from "./Paddle";
+import TextBox from "./Text";
 
 const audio = new Audio();
 document.addEventListener("DOMContentLoaded", bootApp);
@@ -22,7 +23,7 @@ function bootApp() {
 	const canvas = document.body.querySelector("canvas");
 	const video = new Video(canvas).clear(0x333333);
 	const paddle0 = new Paddle({ video, audio });
-	// const paddle1 = new Paddle({ video, audio, y: 32, color: 0xFF0FF });
+	const paddle1 = new Paddle({ video, audio, y: 32, color: 0xFF0FF });
 
 	const inputMap = {
 		ArrowLeft: [
@@ -55,7 +56,7 @@ function bootApp() {
 		const keyMaps = inputMap[key];
 
 		if (keyMaps) {
-			keyMaps.forEach(k => k.keydown());
+			keyMaps.forEach((k) => k.keydown());
 		}
 	});
 
@@ -65,13 +66,45 @@ function bootApp() {
 		const keyMaps = inputMap[key];
 
 		if (keyMaps) {
-			keyMaps.forEach(k => k.keyup());
+			keyMaps.forEach((k) => k.keyup());
 		}
 	});
 
-	const objects = [paddle0, /* paddle1 */];
 
+
+  const multiLineText = new TextBox({
+    video,
+    audio,
+    x: 16,
+    y: 300,
+    string: "This is a longer string.\nI wonder, if commas help readability.\n\nProbably not!",
+    // string: `This\nis\na\ntest\nmultiline\nstring.`,
+    color: 0xFF66FF,
+    typewriter: true,
+  });
+
+  let score = 0;
 	const renderLoop = () => {
+    const objects = [
+      new TextBox({
+        video,
+        audio,
+        x: 16,
+        y: 4,
+        string: `X - ${paddle0.x.toString()}`,
+      }),
+      new TextBox({
+        video,
+        audio,
+        x: 16,
+        y: 13,
+        string: `Y - ${paddle0.y.toString()}`,
+      }),
+      multiLineText,
+      paddle0,
+      paddle1,
+    ];
+
 		video.clear(0x333333);
 
 		objects.forEach((o) => o.tick());

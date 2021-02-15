@@ -1,1 +1,0 @@
-{"version":3,"sources":["src/styles.css"],"names":[],"mappings":"AAAA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA","file":"styles.dd855970.css","sourceRoot":"..","sourcesContent":["body {\n  font-family: sans-serif;\n  background-color: black;\n}\n\ncanvas {\n  display: block;\n  border: solid black thick;\n  border-radius: 16px;\n  /* filter: blur(1px); */\n}\n"]}
