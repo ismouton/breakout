@@ -5,7 +5,8 @@ body {
 
 canvas {
   display: block;
-  border: solid black thick;
-  border-radius: 16px;
-  /* filter: blur(1px); */
+  border: solid rgba(0, 0, 0, 0.125) 3px;
+  border-radius: 24px;
+  margin: 0 auto;
+  margin-top: 32px;
 }

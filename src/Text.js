@@ -409,6 +409,15 @@ const characterMap = {
 		[o, o, o, o, o, o, o],
 		[o, o, o, o, o, o, o],
 	],
+	":": [
+		[o, o, o, o, o, o, o],
+		[o, o, l, l, o, o, o],
+		[o, o, l, l, o, o, o],
+		[o, o, o, o, o, o, o],
+		[o, o, o, o, o, o, o],
+		[o, o, l, l, o, o, o],
+		[o, o, l, l, o, o, o],
+	],
 };
 
 class TextBox extends Character {

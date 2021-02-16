@@ -1,25 +1,10 @@
-const timedDo = (fn, millis) => {
-	return new Promise((resolve, reject) => {
-		setTimeout(() => {
-			let returnValue;
-			try {
-				returnValue = fn();
-			} catch (e) {
-				reject(e);
-			}
-
-			resolve(returnValue);
-		}, millis);
-	});
-};
-
 export default class Audio {
 	constructor() {
 		let audioCtx = window.AudioContext || window.webkitAudioContext;
 		this.audioCtx = new audioCtx();
 	}
 
-	async playNoise({ millis = 1000, bandHz = 600, gainValue = 0.002 } = {}) {
+	async playNoise({ millis = 1000, bandHz = 600, gainValue = 0.02 } = {}) {
 		const bufferSize = this.audioCtx.sampleRate * millis; // set the time of the note
 		const buffer = this.audioCtx.createBuffer(
 			1,

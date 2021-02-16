@@ -7,9 +7,12 @@ import TextBox from "./Text";
 const audio = new Audio();
 document.addEventListener("DOMContentLoaded", bootApp);
 
+const width = 320;
+const height = 240;
+
 function bootApp() {
 	document.body.innerHTML = /*html*/ `
-    <canvas width="640" height="480">
+    <canvas>
     </canvas>
     <button class="play-sound">
       Play Sound
@@ -21,9 +24,9 @@ function bootApp() {
   `;
 
 	const canvas = document.body.querySelector("canvas");
-	const video = new Video(canvas).clear(0x333333);
-	const paddle0 = new Paddle({ video, audio });
-	const paddle1 = new Paddle({ video, audio, y: 32, color: 0xFF0FF });
+	const video = new Video(canvas, { scale: 4, width, height, background: 0x111111 });
+	const paddle0 = new Paddle({ width: 48, video, audio, y: 220, rightBounds: width, height: 12 });
+	// const paddle1 = new Paddle({ video, audio, y: 32, color: 0xff0ff });
 
 	const inputMap = {
 		ArrowLeft: [
@@ -49,7 +52,7 @@ function bootApp() {
 		Space: [],
 	};
 
-	audio.playNoise();
+	// audio.playNoise();
 	document.addEventListener("keydown", (e) => {
 		const { code: key } = e;
 
@@ -70,42 +73,43 @@ function bootApp() {
 		}
 	});
 
+	const multiLineText = new TextBox({
+		video,
+		audio,
+		x: 4,
+		y: 100,
+		string:
+			"This is a longer string.\nI wonder, if commas help readability.\n\nProbably not!",
+		// string: `This\nis\na\ntest\nmultiline\nstring.`,
+		color: 0xff66ff,
+		typewriter: true,
+	});
 
-
-  const multiLineText = new TextBox({
-    video,
-    audio,
-    x: 16,
-    y: 300,
-    string: "This is a longer string.\nI wonder, if commas help readability.\n\nProbably not!",
-    // string: `This\nis\na\ntest\nmultiline\nstring.`,
-    color: 0xFF66FF,
-    typewriter: true,
-  });
-
-  let score = 0;
+	let score = 0;
 	const renderLoop = () => {
-    const objects = [
-      new TextBox({
-        video,
-        audio,
-        x: 16,
-        y: 4,
-        string: `X - ${paddle0.x.toString()}`,
-      }),
-      new TextBox({
-        video,
-        audio,
-        x: 16,
-        y: 13,
-        string: `Y - ${paddle0.y.toString()}`,
-      }),
-      multiLineText,
-      paddle0,
-      paddle1,
-    ];
+		const objects = [
+			new TextBox({
+				video,
+				audio,
+				x: 16,
+				y: 4,
+				string: `X: ${paddle0.x.toString()}`,
+			}),
+			new TextBox({
+				video,
+				audio,
+				x: 80,
+				y: 4,
+				string: `Y: ${paddle0.y.toString()}`,
+			}),
+			multiLineText,
+			paddle0,
+			// paddle1,
+		];
 
-		video.clear(0x333333);
+		// video.clear(0x333333);
+
+    // video.renderStatic();
 
 		objects.forEach((o) => o.tick());
 		video.sync();

@@ -16,7 +16,7 @@ class Paddle extends Character {
 			/**
 			 * Starting X coordinate.
 			 */
-			x = (640 - 64) / 2,
+			x = (320 - 48) / 2,
 
 			/**
 			 * Starting Y coordinate.
@@ -39,9 +39,14 @@ class Paddle extends Character {
 			width = 64,
 
 			/**
+			 * How tall is the paddle.
+			 */
+			height = 16,
+
+			/**
 			 * The cap on `paddleSpeed`.
 			 */
-			maxSpeed = 24,
+			maxSpeed = 8,
 
 			/**
 			 * The color of the paddle.
@@ -65,6 +70,7 @@ class Paddle extends Character {
 		this.rightBounds = rightBounds;
 		this.leftBounds = leftBounds;
 		this.width = width;
+		this.height = height;
 		this.lastDirection = null;
 		this.maxSpeed = maxSpeed;
 		this.color = color;
@@ -103,18 +109,18 @@ class Paddle extends Character {
 		}
 
 		/* Enforce the speed limit */
-		if (this.speed > 24) {
-			this.speed = 24;
-		} else if (this.speed < -24) {
-			this.speed = -24;
+		if (this.speed > this.maxSpeed) {
+			this.speed = this.maxSpeed;
+		} else if (this.speed < -this.maxSpeed) {
+			this.speed = -this.maxSpeed;
 		}
 
 		/* Enforce bounds */
-		let newX = Math.min(this.speed, this.maxSpeed) + this.x;
-		if (newX < this.leftBounds - 1) {
+		let newX = this.speed + this.x;
+		if (newX < this.leftBounds) {
 			newX = this.leftBounds;
 			this.audio.playTrill(5);
-		} else if (newX > this.rightBounds - this.width + 1) {
+		} else if (newX > this.rightBounds - this.width) {
 			newX = this.rightBounds - this.width;
 			this.audio.playTrill(5);
 		}
@@ -127,7 +133,7 @@ class Paddle extends Character {
 			x: this.x,
 			y: this.y,
 			width: this.width,
-			height: 16,
+			height: this.height,
 			color: this.color,
 			borderColor: this.borderColor,
 		});

@@ -1,8 +1,11 @@
 class Video {
-	constructor(el) {
+	constructor(el, {
+		scale = 1,
+		width = 640,
+		height = 480,
+		background = 0x000000,
+	} = {}) {
 		const { tagName } = el;
-		const height = +el.getAttribute("height");
-		const width = +el.getAttribute("width");
 
 		if (tagName !== "CANVAS") {
 			throw Error(
@@ -13,11 +16,17 @@ class Video {
 		this.width = width;
 		this.height = height;
 		this.canvasElement = el;
+		this.canvasElement.width = width * scale;
+		this.canvasElement.height = height * scale;
+		this.scale = scale;
 		this.context = el.getContext("2d");
-		this.imageData = this.context.getImageData(0, 0, width, height);
+		this.imageData = this.context.getImageData(0, 0, width * this.scale, height * this.scale);
+		this.clear(background);
+		this.blankImageData = this.context.createImageData(this.imageData);
+		this.blankImageData.data.set(this.imageData.data);
 	}
 
-	_getIndex = (x, y) => y * (this.width * 4) + x * 4;
+	_getIndex = (x, y) => y * this.scale * (this.width * this.scale * 4) + x * this.scale * 4;
 
 	drawBlock({
 		x,
@@ -42,12 +51,11 @@ class Video {
 	}
 
 	clear(color) {
-		const width = this.width;
-		const height = this.height;
+		const { width, height } = this.canvasElement;
 
 		for (let x = 0; x < width; x++) {
 			for (let y = 0; y < height; y++) {
-				this.setPixel(x, y, color);
+				this.setPixel(x / this.scale, y / this.scale, color);
 			}
 		}
 
@@ -77,16 +85,22 @@ class Video {
 		const blue = color & 0xff;
 		const alpha = 0xff;
 
-		this.imageData.data[idx] = red;
-		this.imageData.data[idx + 1] = green;
-		this.imageData.data[idx + 2] = blue;
-		this.imageData.data[idx + 3] = alpha;
+		for (let localX = 0; localX < this.scale; localX++) {
+			for (let localY = 0; localY < this.scale - 2; localY++) {
+				const offset = idx + (localX * 4) + (localY * this.width * this.scale * 4);
+				this.imageData.data[offset] = red;
+				this.imageData.data[offset + 1] = green;
+				this.imageData.data[offset + 2] = blue;
+				this.imageData.data[offset + 3] = alpha;
+			}
+		}
 
 		return this;
 	}
 
 	sync() {
 		this.context.putImageData(this.imageData, 0, 0);
+		this.imageData.data.set(this.blankImageData.data);
 
 		return this;
 	}
