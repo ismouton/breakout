@@ -72,7 +72,7 @@ export default class Audio {
 	async playRing({
 		frequencies = [440, 480],
 		millis = 2000,
-		gain: gainValue = 0.03,
+		gain: gainValue = 0.01,
 	} = {}) {
 		return new Promise((resolve) => {
 			const gain = this.audioCtx.createGain();
@@ -83,7 +83,7 @@ export default class Audio {
 				const frequency = frequencies[i];
 				const oscillator = this.audioCtx.createOscillator();
 
-				oscillator.type = "sine";
+				oscillator.type = "square";
 				oscillator.frequency.value = frequency;
 				oscillator.connect(gain);
 

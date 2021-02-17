@@ -92,7 +92,7 @@ class Paddle extends Character {
 			if (this.lastDirection === "right") {
 				this.speed += 1;
 			} else {
-				this.speed = -1;
+				this.speed = 1;
 			}
 
 			this.lastDirection = "right";
@@ -100,7 +100,7 @@ class Paddle extends Character {
 			if (this.lastDirection === "left") {
 				this.speed -= 1;
 			} else {
-				this.speed = 1;
+				this.speed = -1;
 			}
 
 			this.lastDirection = "left";
