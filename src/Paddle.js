@@ -1,6 +1,7 @@
+import Block from './Block';
 import Character from './Character';
 
-class Paddle extends Character {
+class Paddle extends Block {
 	constructor(
 		{
 			/**

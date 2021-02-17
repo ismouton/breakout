@@ -1,64 +1,179 @@
+import Block from "./Block";
 import Character from "./Character";
 
-class Ball extends Character {
+class Ball extends Block {
 	constructor({
+		/**
+		 * The width and height of the ball.
+		 */
 		size = 6,
-		xVelocity = 1,
-		yVelocity = -1,
-		x = 0,
-		y = 0,
-		video,
-		audio,
-	} = {}) {
-		super({ video, audio, x, y });
 
-		this.size = size;
+		/**
+		 * The initial X-axis velocity of the ball.
+		 */
+		xVelocity = 1,
+
+		/**
+		 * The initial y-axis velocity of the ball.
+		 */
+		yVelocity = -1,
+
+		/**
+		 * The initial x coordinate of the ball.
+		 */
+		x = 0,
+
+		/**
+		 * The initial y coordinate of the ball.
+		 */
+		y = 0,
+
+		/**
+		 * Instance of `Video`.
+		 */
+		video,
+
+		/**
+		 * Instance of `Audio`.
+		 */
+		audio,
+
+		collisionObjects = [],
+	} = {}) {
+		super(...arguments);
+
+		this.width = size;
+		this.height = size;
 		this.xVelocity = xVelocity;
 		this.yVelocity = yVelocity;
 		this.collisionFlag = false;
+		this.collisionObjects = collisionObjects;
 	}
 
 	_draw() {
 		this.video.drawBlock({
 			x: this.x,
 			y: this.y,
-			width: this.size,
-			height: this.size,
-			color: 0xFFFF00,
-			borderColor: 0xFFFF00,
+			width: this.width,
+			height: this.height,
+			color: 0xffff00,
+			borderColor: 0xffff00,
 		});
 	}
 
-	_handleMovement() {
+	_handleCollision({
+		minX,
+		minY,
+		maxX,
+		maxY,
+	}) {
+		const intersect = (A, B, C, D) => {
+			const ccw = (A,B,C) => (C.y-A.y) * (B.x-A.x) > (B.y-A.y) * (C.x-A.x);
+
+			return ccw(A,C,D) != ccw(B,C,D) && ccw(A,B,C) != ccw(A,B,D)
+		};
+
 		let newX = this.xVelocity + this.x;
 		let newY = this.yVelocity + this.y;
-		const minX = 0;
-		const minY = 0;
-		const maxX = this.video.width - this.size;
-		const maxY = this.video.height - this.size;
 
-		if (newX <= minX) {
-			this.xVelocity = -this.xVelocity;
-			newX = minX;
-			this.collisionFlag = true;
-		}
+		const b0 = { x: this.x, y: this.y };
+		const b1 = { x: newX, y: newY };
 
-		if (newY <= minY) {
-			this.yVelocity = -this.yVelocity;
-			newY = minY;
-			this.collisionFlag = true;
-		}
+		// Top Left
+		const o0 = { x: minX, y: minY };
 
-		if (newX >= maxX) {
+		// Bottom Left
+		const o1 = { x: minX, y: maxY };
+
+		// Bottom Right
+		const o2 = { x: maxX, y: maxY };
+
+		// Top Right
+		const o3 = { x: maxX, y: minY };
+
+		const intersectRightBounds = intersect(
+			{ x: b0.x + this.width, y: b0.y },
+			{ x: b1.x + this.width, y: b1.y },
+			o2,
+			o3,
+		);
+
+		if (intersectRightBounds) {
+			console.log('intersectRightBounds');
+
 			this.xVelocity = -this.xVelocity;
 			newX = maxX;
 			this.collisionFlag = true;
 		}
 
-		if (newY >= maxY) {
+		const intersectTopBounds = intersect(
+			{ x: b0.x, y: b0.y },
+			{ x: b1.x, y: b1.y },
+			o0,
+			o3,
+		);
+
+		if (intersectTopBounds) {
+			console.log('intersectTopBounds');
 			this.yVelocity = -this.yVelocity;
-			newY = maxY;
+			newY = maxY - this.height;
 			this.collisionFlag = true;
+		}
+
+		const intersectLeftBounds = intersect(
+			{ x: b0.x, y: b0.y },
+			{ x: b1.x, y: b1.y },
+			o0,
+			o1,
+		);
+
+		if (intersectLeftBounds) {
+			console.log('intersectLeftBounds');
+
+			this.xVelocity = -this.xVelocity;
+			newX = maxX;
+			this.collisionFlag = true;
+		}
+
+		const intersectBottomBounds = intersect(
+			{ x: b0.x, y: b0.y },
+			{ x: b1.x, y: b1.y },
+			o1,
+			o2,
+		);
+
+		if (intersectBottomBounds) {
+			console.log('intersectBottomBounds');
+			this.yVelocity = -this.yVelocity;
+			newY = maxY - this.height;
+			this.collisionFlag = true;
+		}
+
+		return { newX, newY };
+	}
+
+	_handleMovement() {
+		const minX = 0;
+		const minY = 0;
+		const maxX = this.video.width - this.width;
+		const maxY = this.video.height - this.height;
+
+		const borders = { minX, minY, maxX, maxY };
+		const collisionObjects = this.collisionObjects;
+
+		let newX;
+		let newY;
+
+		for(let i = 0; i < collisionObjects.length; i++) {
+			const collisionObject = collisionObjects[i];
+			const newCoords = this._handleCollision(collisionObject.bounds);
+
+			newX = newCoords.newX;
+			newY = newCoords.newY;
+
+			// if (this.collisionFlag) {
+			// 	break;
+			// }
 		}
 
 		this.x = newX;

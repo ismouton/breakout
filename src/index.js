@@ -4,6 +4,7 @@ import Video from "./Video";
 import Paddle from "./Paddle";
 import TextBox from "./Text";
 import Ball from "./Ball";
+import Block from "./Block";
 
 const audio = new Audio();
 document.addEventListener("DOMContentLoaded", bootApp);
@@ -78,9 +79,21 @@ function bootApp() {
 	// 	typewriter: true,
   // });
   
-  const ball = new Ball({ video, audio, x: 154, y: 200, width: 16, });
+  const block = new Block({ video, audio, width: 6, height: 120, x: 100, y: 10 });
+  const ball = new Ball({ video, audio, x: 154, y: 200, width: 16, collisionObjects: [
+    paddle0,
+    block,
+    // Left wall
+    { bounds: {minY: 0, maxY: height, minX: 0, maxX: 0} },
+    // Right wall
+    { bounds: {minY: 0, maxY: height, minX: width, maxX: width} },
+    // Top wall
+    { bounds: {minY: 0, maxY: -16, minX: 0, maxX: width} },
+    // Bottom wall
+    { bounds: {minY: height, maxY: height + 16, minX: 0, maxX: width} },
+  ]});
 
-	let score = 0;
+  let score = 0;
 	const renderLoop = () => {
 		const objects = [
 			new TextBox({
@@ -100,7 +113,8 @@ function bootApp() {
 			// multiLineText,
       paddle0,
       ball,
-			// paddle1,
+      // paddle1,
+      block,
 		];
 
 		// video.clear(0x333333);

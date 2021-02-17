@@ -72,7 +72,7 @@ export default class Audio {
 	async playRing({
 		frequencies = [440, 480],
 		millis = 2000,
-		gain: gainValue = 0.01,
+		gain: gainValue = 0.03,
 	} = {}) {
 		return new Promise((resolve) => {
 			const gain = this.audioCtx.createGain();
@@ -143,7 +143,7 @@ export default class Audio {
 
 		for (let i = 0; i < 4; i++) {
 			oscillator.detune.setValueAtTime(
-				i % 2 === 0 ? 300 : -200,
+				i % 2 === 0 ? 200 : -200,
 				this.audioCtx.currentTime + i * 125 * 0.001
 			);
 		}

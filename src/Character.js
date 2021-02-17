@@ -19,21 +19,7 @@ class Character {
 		 * Starting Y coordinate.
 		 */
 		x,
-	}) {
-		const isVideoInstanceOfVideo = video.constructor.name === "Video";
-		const isAudioInstanceOfAudio = audio.constructor.name === "Audio";
-		if (!isVideoInstanceOfVideo) {
-			throw Error(
-				"Paddle constructor must be passed instance of `Video` as argument 1!"
-			);
-		}
-
-		if (!isAudioInstanceOfAudio) {
-			throw Error(
-				"Paddle constructor must be passed instance of `Audoio` as argument 2!"
-			);
-		}
-
+	} = {}) {
 		this._x = x;
 		this._y = y;
 		this.audio = audio;
