@@ -1,6 +1,22 @@
 import Block from "./Block";
 import Character from "./Character";
 
+const RIGHT_EDGE = 0;
+const LEFT_EDGE = 1;
+const TOP_EDGE = 2;
+const BOTTOM_EDGE = 3;
+
+const createEdgesFromBounds = (bounds) => {
+	const edges = [];
+
+	edges[TOP_EDGE] = [{ x: bounds.minX, y: bounds.minY}, {x: bounds.maxX, y: bounds.minY}];
+	edges[BOTTOM_EDGE] = [{ x: bounds.minX, y: bounds.maxY}, {x: bounds.maxX, y: bounds.maxY}];
+	edges[LEFT_EDGE] = [{ x: bounds.minX, y: bounds.minY}, {x: bounds.minX, y: bounds.maxY}];
+	edges[RIGHT_EDGE] = [{ x: bounds.maxX, y: bounds.minY}, {x: bounds.maxX, y: bounds.maxY}];
+
+	return edges;
+}
+
 class Ball extends Block {
 	constructor({
 		/**
@@ -61,89 +77,85 @@ class Ball extends Block {
 		});
 	}
 
-	_handleCollision({
-		minX,
-		minY,
-		maxX,
-		maxY,
-	}) {
-		const intersect = (A, B, C, D) => {
-			const ccw = (A,B,C) => (C.y-A.y) * (B.x-A.x) > (B.y-A.y) * (C.x-A.x);
+	_handleCollision(objectBounds) {
+		const testIntersection = (ball, object) => {
+			const intersect = (A, B, C, D) => {
+				// console.log(A,B,C,D);
+				const ccw = (A,B,C) => (C.y-A.y) * (B.x-A.x) > (B.y-A.y) * (C.x-A.x);
+	
+				return ccw(A,C,D) != ccw(B,C,D) && ccw(A,B,C) != ccw(A,B,D)
+			};
+			
+			const ballEdges = createEdgesFromBounds(ball);
+			const objectEdges = createEdgesFromBounds(object);
 
-			return ccw(A,C,D) != ccw(B,C,D) && ccw(A,B,C) != ccw(A,B,D)
+			let intersectRightBounds = false;
+			let intersectTopBounds = false;
+			let intersectLeftBounds = false;
+			let intersectBottomBounds = false;
+
+			if (this.xVelocity > 0) {
+				intersectRightBounds = intersect(...ballEdges[BOTTOM_EDGE], ...objectEdges[LEFT_EDGE])
+					|| intersect(...ballEdges[TOP_EDGE], ...objectEdges[LEFT_EDGE]);
+			} else if (this.xVelocity < 0) {
+				intersectLeftBounds = intersect(...ballEdges[BOTTOM_EDGE], ...objectEdges[RIGHT_EDGE])
+					|| intersect(...ballEdges[TOP_EDGE], ...objectEdges[RIGHT_EDGE]);
+			}
+
+			if (this.yVelocity > 0) {
+				intersectTopBounds = intersect(...ballEdges[LEFT_EDGE], ...objectEdges[TOP_EDGE])
+					|| intersect(...ballEdges[RIGHT_EDGE], ...objectEdges[TOP_EDGE]);
+			} else if (this.yVelocity < 0) {
+				intersectTopBounds = intersect(...ballEdges[LEFT_EDGE], ...objectEdges[BOTTOM_EDGE])
+					|| intersect(...ballEdges[RIGHT_EDGE], ...objectEdges[BOTTOM_EDGE]);
+			}
+
+			return {
+				intersectRightBounds,
+				intersectTopBounds,
+				intersectLeftBounds,
+				intersectBottomBounds,
+			}
 		};
 
 		let newX = this.xVelocity + this.x;
 		let newY = this.yVelocity + this.y;
 
-		const b0 = { x: this.x, y: this.y };
-		const b1 = { x: newX, y: newY };
+		const { maxX, maxY } = objectBounds;
+		
+		const ballBounds = {
+			minX: newX,
+			maxX: newX + this.width,
+			minY: newY,
+			maxY: newY + this.height,
+		};
 
-		// Top Left
-		const o0 = { x: minX, y: minY };
-
-		// Bottom Left
-		const o1 = { x: minX, y: maxY };
-
-		// Bottom Right
-		const o2 = { x: maxX, y: maxY };
-
-		// Top Right
-		const o3 = { x: maxX, y: minY };
-
-		const intersectRightBounds = intersect(
-			{ x: b0.x + this.width, y: b0.y },
-			{ x: b1.x + this.width, y: b1.y },
-			o2,
-			o3,
-		);
+		const {
+			intersectRightBounds,
+			intersectTopBounds,
+			intersectLeftBounds,
+			intersectBottomBounds,
+		} = testIntersection(ballBounds, objectBounds);
 
 		if (intersectRightBounds) {
-			console.log('intersectRightBounds');
-
 			this.xVelocity = -this.xVelocity;
 			newX = maxX;
 			this.collisionFlag = true;
 		}
 
-		const intersectTopBounds = intersect(
-			{ x: b0.x, y: b0.y },
-			{ x: b1.x, y: b1.y },
-			o0,
-			o3,
-		);
-
 		if (intersectTopBounds) {
-			console.log('intersectTopBounds');
 			this.yVelocity = -this.yVelocity;
 			newY = maxY - this.height;
 			this.collisionFlag = true;
 		}
 
-		const intersectLeftBounds = intersect(
-			{ x: b0.x, y: b0.y },
-			{ x: b1.x, y: b1.y },
-			o0,
-			o1,
-		);
-
 		if (intersectLeftBounds) {
-			console.log('intersectLeftBounds');
-
 			this.xVelocity = -this.xVelocity;
 			newX = maxX;
 			this.collisionFlag = true;
 		}
 
-		const intersectBottomBounds = intersect(
-			{ x: b0.x, y: b0.y },
-			{ x: b1.x, y: b1.y },
-			o1,
-			o2,
-		);
-
 		if (intersectBottomBounds) {
-			console.log('intersectBottomBounds');
 			this.yVelocity = -this.yVelocity;
 			newY = maxY - this.height;
 			this.collisionFlag = true;

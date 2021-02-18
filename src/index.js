@@ -79,18 +79,22 @@ function bootApp() {
 	// 	typewriter: true,
   // });
   
-  const block = new Block({ video, audio, width: 6, height: 120, x: 100, y: 10 });
+  const block = new Block({ video, audio, width: 1, height: 120, x: 100, y: 10 });
+  const block1 = new Block({ video, audio, width: 6, height: 160, x: 160, y: 10 });
+  // const back
+
   const ball = new Ball({ video, audio, x: 154, y: 200, width: 16, collisionObjects: [
     paddle0,
     block,
+    block1,
     // Left wall
     { bounds: {minY: 0, maxY: height, minX: 0, maxX: 0} },
     // Right wall
     { bounds: {minY: 0, maxY: height, minX: width, maxX: width} },
     // Top wall
-    { bounds: {minY: 0, maxY: -16, minX: 0, maxX: width} },
+    { bounds: {minY: 0, maxY: 0, minX: 0, maxX: width} },
     // Bottom wall
-    { bounds: {minY: height, maxY: height + 16, minX: 0, maxX: width} },
+    { bounds: {minY: height, maxY: height, minX: 0, maxX: width} },
   ]});
 
   let score = 0;
@@ -115,6 +119,7 @@ function bootApp() {
       ball,
       // paddle1,
       block,
+      block1,
 		];
 
 		// video.clear(0x333333);
