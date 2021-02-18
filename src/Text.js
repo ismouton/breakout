@@ -510,8 +510,6 @@ class TextBox extends Character {
 				}
 			}
 
-			column++;
-
 			for (let localY = 0; localY < rowCount; localY++) {
 				const characterRow = character[localY];
 				const pixelCount = characterRow.length;
@@ -522,6 +520,8 @@ class TextBox extends Character {
 					}
 				}
 			}
+
+			column++;
 		}
 	}
 

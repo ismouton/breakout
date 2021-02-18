@@ -80,7 +80,6 @@ class Ball extends Block {
 	_handleCollision(objectBounds) {
 		const testIntersection = (ball, object) => {
 			const intersect = (A, B, C, D) => {
-				// console.log(A,B,C,D);
 				const ccw = (A,B,C) => (C.y-A.y) * (B.x-A.x) > (B.y-A.y) * (C.x-A.x);
 	
 				return ccw(A,C,D) != ccw(B,C,D) && ccw(A,B,C) != ccw(A,B,D)
@@ -137,31 +136,37 @@ class Ball extends Block {
 			intersectBottomBounds,
 		} = testIntersection(ballBounds, objectBounds);
 
+		let localCollisionFlag = false;
+
 		if (intersectRightBounds) {
 			this.xVelocity = -this.xVelocity;
 			newX = maxX;
 			this.collisionFlag = true;
+			localCollisionFlag = true;
 		}
 
 		if (intersectTopBounds) {
 			this.yVelocity = -this.yVelocity;
 			newY = maxY - this.height;
 			this.collisionFlag = true;
+			localCollisionFlag = true;
 		}
 
 		if (intersectLeftBounds) {
 			this.xVelocity = -this.xVelocity;
 			newX = maxX;
 			this.collisionFlag = true;
+			localCollisionFlag = true;
 		}
 
 		if (intersectBottomBounds) {
 			this.yVelocity = -this.yVelocity;
 			newY = maxY - this.height;
 			this.collisionFlag = true;
+			localCollisionFlag = true;
 		}
 
-		return { newX, newY };
+		return { collisionFlag: localCollisionFlag, newCoords: { newX, newY }};
 	}
 
 	_handleMovement() {
@@ -178,14 +183,14 @@ class Ball extends Block {
 
 		for(let i = 0; i < collisionObjects.length; i++) {
 			const collisionObject = collisionObjects[i];
-			const newCoords = this._handleCollision(collisionObject.bounds);
+			const { newCoords, collisionFlag } = this._handleCollision(collisionObject.bounds);
 
 			newX = newCoords.newX;
 			newY = newCoords.newY;
 
-			// if (this.collisionFlag) {
-			// 	break;
-			// }
+			if (collisionFlag) {
+				collisionObject.destroy && collisionObject.destroy();
+			}
 		}
 
 		this.x = newX;

@@ -1,65 +1,63 @@
-import Block from './Block';
-import Character from './Character';
+import Block from "./Block";
+import Character from "./Character";
 
 class Paddle extends Block {
-	constructor(
-		{
-			/**
-			 * Instance of `Video`.
-			 */
-			video,
+	constructor({
+		/**
+		 * Instance of `Video`.
+		 */
+		video,
 
-			/**
-			 * Instance of `Audio`.
-			 */
-			audio,
+		/**
+		 * Instance of `Audio`.
+		 */
+		audio,
 
-			/**
-			 * Starting X coordinate.
-			 */
-			x = (320 - 48) / 2,
+		/**
+		 * Starting X coordinate.
+		 */
+		x = (320 - 48) / 2,
 
-			/**
-			 * Starting Y coordinate.
-			 */
-			y = 430,
+		/**
+		 * Starting Y coordinate.
+		 */
+		y = 430,
 
-			/**
-			 * How far can the paddle move right until it hits a wall.
-			 */
-			rightBounds = 640,
+		/**
+		 * How far can the paddle move right until it hits a wall.
+		 */
+		rightBounds = 640,
 
-			/**
-			 * How far can the paddle move left until it hits a wall.
-			 */
-			leftBounds = 0,
+		/**
+		 * How far can the paddle move left until it hits a wall.
+		 */
+		leftBounds = 0,
 
-			/**
-			 * How wide is the paddle.
-			 */
-			width = 64,
+		/**
+		 * How wide is the paddle.
+		 */
+		width = 64,
 
-			/**
-			 * How tall is the paddle.
-			 */
-			height = 16,
+		/**
+		 * How tall is the paddle.
+		 */
+		height = 16,
 
-			/**
-			 * The cap on `paddleSpeed`.
-			 */
-			maxSpeed = 8,
+		/**
+		 * The cap on `paddleSpeed`.
+		 */
+		maxSpeed = 8,
 
-			/**
-			 * The color of the paddle.
-			 */
-			color = 0xffffff,
+		/**
+		 * The color of the paddle.
+		 */
+		color = 0xffffff,
 
-			/**
-			 * The color of the border of the paddle.
-			 */
-			borderColor = 0x000000,
-		} = {}
-	) {
+		/**
+		 * The color of the border of the paddle.
+		 */
+		borderColor = 0x000000,
+	} = {}) {
 		super({
 			x,
 			y,
@@ -84,6 +82,13 @@ class Paddle extends Block {
 			right: false,
 		};
 	}
+
+	/**
+	 * Noop.
+	 * Paddle is technically a block so we override this method to be a noop
+	 * as the paddle should be impervious to the balls destroying powers.
+	 */
+	destroy() {}
 
 	_handleMovement = () => {
 		/* Handle input */

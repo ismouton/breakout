@@ -12,6 +12,8 @@ class Block extends Character {
     y = 0,
     video,
     audio,
+    borderColor = 0xffff00,
+    color = 0xffff00,
   } = {}) {
     super(...arguments);
 
@@ -19,6 +21,9 @@ class Block extends Character {
 
     this.width = width;
     this.height = height;
+    this.dead = false;
+    this.color = color;
+    this.borderColor = borderColor;
   }
 
   _draw() {
@@ -27,13 +32,21 @@ class Block extends Character {
 			y: this.y,
 			width: this.width,
 			height: this.height,
-			color: 0xffff00,
-			borderColor: 0xffff00,
+			color: this.color,
+			borderColor: this.borderColor,
 		});
   }
 
   tick() {
     this._draw();
+  }
+
+  /**
+   * Mark as dead and available for garbage collection.
+   */
+  destroy() {
+    this.dead = true;
+    console.log(`Killing ${this.constructor.name}!`);
   }
   
   get bounds() {
