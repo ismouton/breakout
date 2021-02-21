@@ -2,10 +2,14 @@ import Character from "./Character";
 import TextBox from "./Text";
 
 class TitleScreen extends Character {
-	constructor() {
+	constructor({ startCallback }) {
 		super(...arguments);
-		this.x = 240;
-		this.y = 10;
+
+		this.startCallback = startCallback;
+		this.x = 0;
+		this.y = 0;
+
+		this.scrollUpFlag = false;
 
 		this.objects = [];
 		this.objects.push(
@@ -24,7 +28,16 @@ class TitleScreen extends Character {
 				x: 8 * 5,
 				y: 8 * 4,
 				string: `breakout`,
-				color: [0xff00ff, 0xffff00, 0x00ffff, 0xff0000, 0x00ff00, 0x2222ff],
+				color: [
+					0xff00ff,
+					0xffff00,
+					0x00ffff,
+					0xff0000,
+					0x00ff00,
+					0xff8000,
+					0x2222ff,
+					0xffff00,
+				],
 			}),
 			new TextBox({
 				blinkCycle: {
@@ -49,36 +62,35 @@ class TitleScreen extends Character {
 
 	_draw() {
 		this.objects.forEach((o) => o.tick());
-		// console.log('tick', this._cycleCount);
-		// const legLength = 5;
 
-		// if (this._cycleCount % 3 === 0) {
-		//         for (let i = 0; i < legLength; i++) {
-		//                 this.video.setPixel(this.x + i, this.y, 0xFF00FF);
-		//                 this.video.setPixel(this.x, this.y + i, 0xFF00FF);
-		//                 this.video.setPixel(this.x - i, this.y, 0xFF00FF);
-		//                 this.video.setPixel(this.x, this.y - i, 0xFF00FF);
-		//         }
-		// } else {
-		//         for (let i = 0; i < legLength - 2; i++) {
-		//                 this.video.setPixel(this.x + i, this.y + i, 0xFF00FF);
-		//                 this.video.setPixel(this.x - i, this.y - i, 0xFF00FF);
+		if (this.scrollUpFlag) {
+			const scrollSpeed = -4;
+			this.y += scrollSpeed;
+			if (this.y < -240) {
+				this.destroy();
 
-		//                 this.video.setPixel(this.x + i, this.y - i, 0xFF00FF);
-		//                 this.video.setPixel(this.x - i, this.y + i, 0xFF00FF);
-		//         }
-		// }
+				return;
+			}
+
+			for (let i = 0; i < this.objects.length; i++) {
+				const object = this.objects[i];
+
+				object.y += scrollSpeed;
+			}
+		}
 	}
 
-	_handleInput() {
-		/* Should use menu component */
-	}
+	start = async () => {
+		this.scrollUpFlag = true;
+
+		// await this.audio.playTrill(100);
+
+		// this.startCallback && this.startCallback();
+		// this.destroy();
+	};
 
 	_tick() {
-		this._handleInput();
 		this._draw();
-
-		this.x -= 1;
 	}
 }
 

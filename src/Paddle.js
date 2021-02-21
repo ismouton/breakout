@@ -58,8 +58,7 @@ class Paddle extends Block {
 		 */
 		borderColor = 0x000000,
 	} = {}) {
-		console.log(...arguments);
-		super(arguments[0]);
+		super(...arguments);
 
 		this.speed = 0;
 		this.rightBounds = rightBounds;

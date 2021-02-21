@@ -101,32 +101,37 @@ export default class Audio {
 		});
 	}
 
-	async playScript(script) {
-		const oscillator = this.audioCtx.createOscillator();
-		const gain = this.audioCtx.createGain();
-
-		oscillator.type = "square";
-		oscillator.frequency.value = 100;
-		gain.gain.value = 0.03;
-		oscillator.connect(gain);
-
-		gain.connect(this.audioCtx.destination);
-		oscillator.start();
-
-		let totalTime = 0;
-
-		for (let i = 0; i < script.length; i++) {
-			const [frequency, millis] = script[i];
-
-			oscillator.frequency.setValueAtTime(
-				frequency,
-				this.audioCtx.currentTime + totalTime * 0.001
-			);
-
-			totalTime += millis;
-		}
-
-		setTimeout(() => oscillator.stop(), totalTime);
+	playScript(script) {
+		return new Promise ((resolve) => {
+			const oscillator = this.audioCtx.createOscillator();
+			const gain = this.audioCtx.createGain();
+	
+			oscillator.type = "square";
+			oscillator.frequency.value = 100;
+			gain.gain.value = 0.03;
+			oscillator.connect(gain);
+	
+			gain.connect(this.audioCtx.destination);
+			oscillator.start();
+	
+			let totalTime = 0;
+	
+			for (let i = 0; i < script.length; i++) {
+				const [frequency, millis] = script[i];
+	
+				oscillator.frequency.setValueAtTime(
+					frequency,
+					this.audioCtx.currentTime + totalTime * 0.001
+				);
+	
+				totalTime += millis;
+			}
+	
+			setTimeout(() => {
+				resolve();
+				oscillator.stop();
+			}, totalTime);
+		});
 	}
 
 	async playPause() {
@@ -180,7 +185,7 @@ export default class Audio {
 	}
 
 	async playTrill(millis = 50) {
-		this.playScript([
+		return await this.playScript([
 			[250, millis],
 			[500, millis],
 			[1000, millis],

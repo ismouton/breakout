@@ -6,6 +6,7 @@ import TextBox from "./Text";
 import Ball from "./Ball";
 import Block from "./Block";
 import TitleScreen from "./TitleScreen";
+import HighScore from "./HighScore";
 
 let blocksDestroyed = 0;
 
@@ -39,7 +40,20 @@ function bootApp() {
 	});
 	// const paddle1 = new Paddle({ video, audio, y: 32, color: 0xff0ff });
 
+	const titleScreen = new TitleScreen({
+		audio,
+		video,
+	});
+
+	const highScore = new HighScore({
+		x: 0,
+		y: 0,
+		audio,
+		video,
+	});
+
 	const inputMap = {
+		Enter: [{ keydown: titleScreen.start }],
 		ArrowLeft: [
 			{
 				keydown: paddle0.pressLeft,
@@ -70,7 +84,7 @@ function bootApp() {
 		const keyMaps = inputMap[key];
 
 		if (keyMaps) {
-			keyMaps.forEach((k) => k.keydown());
+			keyMaps.forEach((k) => k.keydown && k.keydown());
 		}
 	});
 
@@ -80,17 +94,17 @@ function bootApp() {
 		const keyMaps = inputMap[key];
 
 		if (keyMaps) {
-			keyMaps.forEach((k) => k.keyup());
+			keyMaps.forEach((k) => k.keyup && k.keyup());
 		}
 	});
 
 	const blockColors = [
-		0xFF0000,
-		0x00FF00,
-		0x0000FF,
-		0xFF00FF,
-		0xFFFF00,
-		0x00FFFF,
+		0xff0000,
+		0x00ff00,
+		0x0000ff,
+		0xff00ff,
+		0xffff00,
+		0x00ffff,
 	];
 
 	const blocks = [];
@@ -105,7 +119,7 @@ function bootApp() {
 				height,
 				y: y * height + 16,
 				x: x * width,
-				color: blockColors[y % (blockColors.length  -1)],
+				color: blockColors[y % (blockColors.length - 1)],
 				borderColor: 0x000000,
 				onReap: () => blocksDestroyed++,
 			});
@@ -158,7 +172,7 @@ function bootApp() {
 		ball,
 		// paddle1,
 	];
-	
+
 	let scoreText = new TextBox({
 		video,
 		audio,
@@ -166,29 +180,29 @@ function bootApp() {
 		y: 4,
 	});
 
-	let blockText = new TextBox({
-		video,
-		audio,
-		x: 150,
-		y: 4,
-	});
-
-	const titleScreen = new TitleScreen({ audio, video });
+	const renderArray = [];
 
 	const renderLoop = () => {
-		[
-			titleScreen,
-			// new TextBox({
-			// 	video,
-			// 	audio,
-			// 	x: 269,
-			// 	y: 4,
-			// 	string: `X: ${paddle0.x.toString()}`,
-			// }),
-			// scoreText.setString(`Score: ${score.toString()}`),
-			// blockText.setString(`Blox: ${blocksDestroyed.toString()}`),
-			// ...objects,
-		].forEach((o) => o.tick());
+		renderArray.length = 0;
+
+		if (!titleScreen.dead) {
+			// renderArray.push(titleScreen);
+			renderArray.push(highScore);
+		} else {
+			renderArray.push(
+				new TextBox({
+					video,
+					audio,
+					x: 269,
+					y: 4,
+					string: `X: ${paddle0.x.toString()}`,
+				}),
+				scoreText.setString(`Score: ${score.toString()}`),
+				...objects,
+			);
+		}
+
+		renderArray.forEach((o) => o.tick && o.tick());
 
 		/* reap dead objects */
 		for (let i = 0; i < collisionObjects.length; i++) {
