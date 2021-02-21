@@ -5,6 +5,9 @@ import Paddle from "./Paddle";
 import TextBox from "./Text";
 import Ball from "./Ball";
 import Block from "./Block";
+import TitleScreen from "./TitleScreen";
+
+let blocksDestroyed = 0;
 
 const audio = new Audio();
 document.addEventListener("DOMContentLoaded", bootApp);
@@ -29,6 +32,7 @@ function bootApp() {
 		width: 48,
 		video,
 		audio,
+		x: (320 - 48) / 2,
 		y: 220,
 		rightBounds: width,
 		height: 12,
@@ -80,35 +84,6 @@ function bootApp() {
 		}
 	});
 
-	const multiLineText = new TextBox({
-		video,
-		audio,
-		x: 4,
-		y: 100,
-		string:
-			"This is a longer string.\nI wonder, if commas help readability.\n\nProbably not!",
-		color: 0xff66ff,
-		typewriter: true,
-	});
-
-	const block = new Block({
-		video,
-		audio,
-		width: 1,
-		height: 120,
-		x: 100,
-		y: 10,
-	});
-	const block1 = new Block({
-		video,
-		audio,
-		width: 6,
-		height: 160,
-		x: 160,
-		y: 10,
-	});
-	// const back
-
 	const blockColors = [
 		0xFF0000,
 		0x00FF00,
@@ -121,7 +96,7 @@ function bootApp() {
 	const blocks = [];
 	for (let y = 0; y < 9; y++) {
 		const width = 32;
-		const height = 8;
+		const height = 10;
 		for (let x = 0; x < 10; x++) {
 			const block = new Block({
 				video,
@@ -132,6 +107,7 @@ function bootApp() {
 				x: x * width,
 				color: blockColors[y % (blockColors.length  -1)],
 				borderColor: 0x000000,
+				onReap: () => blocksDestroyed++,
 			});
 
 			blocks.push(block);
@@ -150,7 +126,7 @@ function bootApp() {
 		// Top wall
 		{ bounds: { minY: 0, maxY: 0, minX: 0, maxX: width } },
 		// Bottom wall
-		{ bounds: { minY: height, maxY: height, minX: 0, maxX: width } },
+		// { bounds: { minY: height, maxY: height, minX: 0, maxX: width } },
 	];
 
 	const ball = new Ball({
@@ -162,11 +138,11 @@ function bootApp() {
 		collisionObjects,
 	});
 	const ball1 = new Ball({
-		xVelocity: -1,
+		xVelocity: 1,
 		video,
 		audio,
 		x: 154,
-		y: 200,
+		y: 10,
 		width: 16,
 		collisionObjects,
 	});
@@ -182,24 +158,36 @@ function bootApp() {
 		ball,
 		// paddle1,
 	];
+	
+	let scoreText = new TextBox({
+		video,
+		audio,
+		x: 4,
+		y: 4,
+	});
+
+	let blockText = new TextBox({
+		video,
+		audio,
+		x: 150,
+		y: 4,
+	});
+
+	const titleScreen = new TitleScreen({ audio, video });
 
 	const renderLoop = () => {
 		[
-			new TextBox({
-				video,
-				audio,
-				x: 269,
-				y: 4,
-				string: `X: ${paddle0.x.toString()}`,
-			}),
-			new TextBox({
-				video,
-				audio,
-				x: 4,
-				y: 4,
-				string: `Score: ${score.toString()}`,
-			}),
-			...objects,
+			titleScreen,
+			// new TextBox({
+			// 	video,
+			// 	audio,
+			// 	x: 269,
+			// 	y: 4,
+			// 	string: `X: ${paddle0.x.toString()}`,
+			// }),
+			// scoreText.setString(`Score: ${score.toString()}`),
+			// blockText.setString(`Blox: ${blocksDestroyed.toString()}`),
+			// ...objects,
 		].forEach((o) => o.tick());
 
 		/* reap dead objects */
@@ -216,6 +204,7 @@ function bootApp() {
 
 			if (object.dead) {
 				score += 100;
+				object.reap();
 				objects.splice(i, 1);
 			}
 		}

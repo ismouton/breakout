@@ -147,7 +147,7 @@ class Ball extends Block {
 
 		if (intersectTopBounds) {
 			this.yVelocity = -this.yVelocity;
-			newY = maxY - this.height;
+			newY = maxY;
 			this.collisionFlag = true;
 			localCollisionFlag = true;
 		}
@@ -197,7 +197,7 @@ class Ball extends Block {
 		this.y = newY;
 	}
 
-	tick() {
+	_tick() {
 		/* Handle collision from previous tick */
 		if (this.collisionFlag) {
 			this.audio.playRing({ millis: 50, frequencies: [100] });

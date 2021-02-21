@@ -58,12 +58,8 @@ class Paddle extends Block {
 		 */
 		borderColor = 0x000000,
 	} = {}) {
-		super({
-			x,
-			y,
-			audio,
-			video,
-		});
+		console.log(...arguments);
+		super(arguments[0]);
 
 		this.speed = 0;
 		this.rightBounds = rightBounds;
@@ -192,7 +188,7 @@ class Paddle extends Block {
 	/**
 	 * Iterate the object.
 	 */
-	tick = () => {
+	_tick = () => {
 		this._handleMovement();
 		this._draw();
 	};

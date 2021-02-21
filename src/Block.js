@@ -37,18 +37,10 @@ class Block extends Character {
 		});
   }
 
-  tick() {
+  _tick() {
     this._draw();
   }
 
-  /**
-   * Mark as dead and available for garbage collection.
-   */
-  destroy() {
-    this.dead = true;
-    console.log(`Killing ${this.constructor.name}!`);
-  }
-  
   get bounds() {
     return {
       minX: this.x,
