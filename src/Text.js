@@ -437,19 +437,29 @@ const characterMap = {
 		[W, W,  ,  ,  ,  ,  ],
 		[W,  ,  ,  ,  ,  ,  ],
 	],
+	"}": [
+		[ , W, W,  ,  ,  ,  ],
+		[W,  ,  , W,  ,  ,  ],
+		[W,  ,  , W,  ,  , ],
+		[ , W, W,  , W,  , W],
+		[ ,  ,  ,  , W, W,  ],
+		[ ,  ,  ,  , W,  , W],
+		[ ,  ,  ,  , W,  , W],
+	],
+	"{": [
+		[ ,  ,  ,  ,  ,  ,  ],
+		[ ,  , W,  ,  ,  ,  ],
+		[ , W,  ,  ,  ,  ,  ],
+		[W, W, W, W, W, W, W],
+		[ , W,  ,  ,  ,  ,  ],
+		[ ,  , W,  ,  ,  ,  ],
+		[ ,  ,  ,  ,  ,  ,  ],
+	],
 };
 
 class TextBox extends Character {
 	constructor({
-		/**
-		 * Instance of `Video`.
-		 */
-		video,
-
-		/**
-		 * Instance of `Audio`.
-		 */
-		audio,
+		context,
 
 		/**
 		 * Starting X coordinate.
@@ -482,7 +492,7 @@ class TextBox extends Character {
 
 		scale = 1,
 	}) {
-		super({ x, y, audio, video, x, y });
+		super(...arguments);
 
 		this.setString(string);
 
@@ -553,7 +563,7 @@ class TextBox extends Character {
 					if (characterPixel) {
 						for (let scaleY = 0; scaleY < scale; scaleY++) {
 							for (let scaleX = 0; scaleX < scale; scaleX++) {
-								this.video.setPixel(
+								this._context.video.setPixel(
 									scaleX + this._x + (localX * scale) + column * 8 * scale,
 									scaleY + this._y + (localY * scale) + row * 8 * scale,
 									Array.isArray(this.color) ? this.color[characterIndex % this.color.length] : this.color,

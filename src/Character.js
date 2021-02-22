@@ -1,15 +1,9 @@
 class Character {
 	constructor({
 		/**
-		 * Instance of `Video`.
+		 * Application context.
 		 */
-		video,
-
-		/**
-		 * Instance of `Audio`.
-		 */
-		audio,
-
+		context,
 		/**
 		 * Starting X coordinate.
 		 */
@@ -30,12 +24,11 @@ class Character {
 		 */
 		lifeCycleInTicks,
 	} = {}) {
+		this._context = context;
 		this._x = x;
 		this._y = y;
-		this.audio = audio;
-		this.video = video;
 
-		this._cycleCount = 0;
+		this._cycleCount = 1;
 		this._reapCB = onReap;
 		this._lifeCycleInTicks = lifeCycleInTicks;
 	}

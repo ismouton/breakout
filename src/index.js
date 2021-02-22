@@ -7,6 +7,7 @@ import Ball from "./Ball";
 import Block from "./Block";
 import TitleScreen from "./TitleScreen";
 import HighScore from "./HighScore";
+import InputGrid from "./InputGrid";
 
 let blocksDestroyed = 0;
 
@@ -52,50 +53,31 @@ function bootApp() {
 		video,
 	});
 
-	const inputMap = {
-		Enter: [{ keydown: titleScreen.start }],
-		ArrowLeft: [
-			{
-				keydown: paddle0.pressLeft,
-				keyup: paddle0.releaseLeft,
-			},
-			// {
-			// 	keydown: paddle1.pressRight,
-			// 	keyup: paddle1.releaseRight,
-			// },
-		],
-		ArrowRight: [
-			{
-				keydown: paddle0.pressRight,
-				keyup: paddle0.releaseRight,
-			},
-			// {
-			// 	keydown: paddle1.pressLeft,
-			// 	keyup: paddle1.releaseLeft,
-			// },
-		],
-		Space: [],
-	};
+	const inputMap = {};
 
 	// audio.playNoise();
 	document.addEventListener("keydown", (e) => {
 		const { code: key } = e;
 
-		const keyMaps = inputMap[key];
-
-		if (keyMaps) {
-			keyMaps.forEach((k) => k.keydown && k.keydown());
-		}
+		inputMap[key] = true;
 	});
 
 	document.addEventListener("keyup", (e) => {
 		const { code: key } = e;
 
-		const keyMaps = inputMap[key];
+		delete inputMap[key];
+	});
 
-		if (keyMaps) {
-			keyMaps.forEach((k) => k.keyup && k.keyup());
-		}
+	const context = {
+		audio,
+		video,
+		inputMap,
+	};
+
+	const inputGrid = new InputGrid({
+		context,
+		x: 32,
+		y: 32,
 	});
 
 	const blockColors = [
@@ -187,7 +169,7 @@ function bootApp() {
 
 		if (!titleScreen.dead) {
 			// renderArray.push(titleScreen);
-			renderArray.push(highScore);
+			renderArray.push(inputGrid);
 		} else {
 			renderArray.push(
 				new TextBox({

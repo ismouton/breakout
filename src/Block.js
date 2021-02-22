@@ -27,7 +27,7 @@ class Block extends Character {
   }
 
   _draw() {
-    this.video.drawBlock({
+    this._context.video.drawBlock({
 			x: this.x,
 			y: this.y,
 			width: this.width,
