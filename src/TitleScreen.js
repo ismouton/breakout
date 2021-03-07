@@ -2,7 +2,7 @@ import Character from "./Character";
 import TextBox from "./Text";
 
 class TitleScreen extends Character {
-	constructor({ startCallback }) {
+	constructor({ startCallback, context }) {
 		super(...arguments);
 
 		this.startCallback = startCallback;
@@ -14,17 +14,15 @@ class TitleScreen extends Character {
 		this.objects = [];
 		this.objects.push(
 			new TextBox({
+				context,
 				scale: 1,
-				audio: this.audio,
-				video: this.video,
 				x: 8 * 5,
 				y: 8 * 3,
 				string: `Shane's`,
 			}),
 			new TextBox({
+				context,
 				scale: 4,
-				audio: this.audio,
-				video: this.video,
 				x: 8 * 5,
 				y: 8 * 4,
 				string: `breakout`,
@@ -40,19 +38,17 @@ class TitleScreen extends Character {
 				],
 			}),
 			new TextBox({
+				context,
 				blinkCycle: {
 					onDutyCycles: 45,
 					offDutyCycles: 45,
 				},
-				audio: this.audio,
-				video: this.video,
 				x: 8 * 15,
 				y: 8 * 16,
 				string: `Push start`,
 			}),
 			new TextBox({
-				audio: this.audio,
-				video: this.video,
+				context,
 				x: 8 * 27,
 				y: 8 * 29,
 				string: `2021 ismouton`,
@@ -80,16 +76,22 @@ class TitleScreen extends Character {
 		}
 	}
 
-	start = async () => {
+	_handleInput = async () => {
+		if (!this._context.keyboard.inputMap.Enter) {
+			return;
+		}
+
 		this.scrollUpFlag = true;
 
-		// await this.audio.playTrill(100);
+		await this._context.audio.playTrill(100);
 
-		// this.startCallback && this.startCallback();
-		// this.destroy();
+		this.startCallback && this.startCallback();
+		this.destroy();
+		this.reap();
 	};
 
 	_tick() {
+		this._handleInput();
 		this._draw();
 	}
 }

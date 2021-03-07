@@ -9,4 +9,5 @@ canvas {
   border-radius: 24px;
   margin: 0 auto;
   margin-top: 32px;
+  cursor: none;
 }

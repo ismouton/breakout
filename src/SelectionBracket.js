@@ -5,7 +5,7 @@ class SelectionBracket extends Character {
 	_draw() {
 		const r = 9;
 		const angle = 2;
-		const q = Math.PI / 32;
+		const q = 2 * Math.PI / 64;
 
 		const size = 2;
 

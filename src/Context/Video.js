@@ -78,7 +78,24 @@ class Video {
 		return this;
 	}
 
+	setAoA(originX, originY, aoa) {
+		for (let y = 0; y < aoa.length; y++) {
+			const row = aoa[y];
+			for (let x = 0; x < row.length; x++) {
+			  const pixel = row[x];
+			  if (pixel != null) {
+				this.setPixel(originX + x, originY + y, pixel);
+			  }
+			}
+		  }
+	}
+
 	setPixel(x, y, color) {
+		// Don't draw out of bounds.
+		if (x > this.width - 1 || y > this.height - 1) {
+			return;
+		}
+
 		const idx = this._getIndex(x, y);
 		const red = (color >> 16) & 0xff;
 		const green = (color >> 8) & 0xff;

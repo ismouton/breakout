@@ -67,7 +67,7 @@ class Ball extends Block {
 	}
 
 	_draw() {
-		this.video.drawBlock({
+		this._context.video.drawBlock({
 			x: this.x,
 			y: this.y,
 			width: this.width,
@@ -172,8 +172,8 @@ class Ball extends Block {
 	_handleMovement() {
 		const minX = 0;
 		const minY = 0;
-		const maxX = this.video.width - this.width;
-		const maxY = this.video.height - this.height;
+		const maxX = this._context.video.width - this.width;
+		const maxY = this._context.video.height - this.height;
 
 		const borders = { minX, minY, maxX, maxY };
 		const collisionObjects = this.collisionObjects;
@@ -200,7 +200,7 @@ class Ball extends Block {
 	_tick() {
 		/* Handle collision from previous tick */
 		if (this.collisionFlag) {
-			this.audio.playRing({ millis: 50, frequencies: [100] });
+			this._context.audio.playRing({ millis: 50, frequencies: [100] });
 			this.collisionFlag = false;
 		}
 

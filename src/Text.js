@@ -2,6 +2,8 @@ import Character from "./Character";
 
 // const   = false;
 const W = true;
+
+// prettier-ignore
 const characterMap = {
 	" ": [
 		[ ,  ,  ,  ,  ,  ,  ],
@@ -437,7 +439,7 @@ const characterMap = {
 		[W, W,  ,  ,  ,  ,  ],
 		[W,  ,  ,  ,  ,  ,  ],
 	],
-	"}": [
+	"\0": [
 		[ , W, W,  ,  ,  ,  ],
 		[W,  ,  , W,  ,  ,  ],
 		[W,  ,  , W,  ,  , ],
@@ -446,7 +448,7 @@ const characterMap = {
 		[ ,  ,  ,  , W,  , W],
 		[ ,  ,  ,  , W,  , W],
 	],
-	"{": [
+	"\b": [
 		[ ,  ,  ,  ,  ,  ,  ],
 		[ ,  , W,  ,  ,  ,  ],
 		[ , W,  ,  ,  ,  ,  ],
@@ -564,9 +566,11 @@ class TextBox extends Character {
 						for (let scaleY = 0; scaleY < scale; scaleY++) {
 							for (let scaleX = 0; scaleX < scale; scaleX++) {
 								this._context.video.setPixel(
-									scaleX + this._x + (localX * scale) + column * 8 * scale,
-									scaleY + this._y + (localY * scale) + row * 8 * scale,
-									Array.isArray(this.color) ? this.color[characterIndex % this.color.length] : this.color,
+									scaleX + this._x + localX * scale + column * 8 * scale,
+									scaleY + this._y + localY * scale + row * 8 * scale,
+									Array.isArray(this.color)
+										? this.color[characterIndex % this.color.length]
+										: this.color
 								);
 							}
 						}
@@ -611,7 +615,11 @@ class TextBox extends Character {
 			this._characterCount < this._characters.length
 		) {
 			this._characterCount++;
-			this.audio.playRing({ frequencies: [700, 650], millis: 30, gain: 0.02 });
+			this._context.audio.playRing({
+				frequencies: [700, 650],
+				millis: 30,
+				gain: 0.02,
+			});
 		}
 
 		this._draw();

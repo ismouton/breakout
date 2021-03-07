@@ -102,31 +102,31 @@ export default class Audio {
 	}
 
 	playScript(script) {
-		return new Promise ((resolve) => {
+		return new Promise((resolve) => {
 			const oscillator = this.audioCtx.createOscillator();
 			const gain = this.audioCtx.createGain();
-	
+
 			oscillator.type = "square";
 			oscillator.frequency.value = 100;
 			gain.gain.value = 0.03;
 			oscillator.connect(gain);
-	
+
 			gain.connect(this.audioCtx.destination);
 			oscillator.start();
-	
+
 			let totalTime = 0;
-	
+
 			for (let i = 0; i < script.length; i++) {
 				const [frequency, millis] = script[i];
-	
+
 				oscillator.frequency.setValueAtTime(
 					frequency,
 					this.audioCtx.currentTime + totalTime * 0.001
 				);
-	
+
 				totalTime += millis;
 			}
-	
+
 			setTimeout(() => {
 				resolve();
 				oscillator.stop();

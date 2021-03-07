@@ -1,3 +1,4 @@
+const classCounterMap = {};
 class Character {
 	constructor({
 		/**
@@ -28,6 +29,14 @@ class Character {
 		this._x = x;
 		this._y = y;
 
+		const name = this.constructor.name;
+
+		if (classCounterMap[name] === undefined) {
+			classCounterMap[name] = 0;
+		}
+
+		this.id = `${name}-${classCounterMap[name]++}`;
+
 		this._cycleCount = 1;
 		this._reapCB = onReap;
 		this._lifeCycleInTicks = lifeCycleInTicks;
@@ -49,18 +58,18 @@ class Character {
 		return this._y;
 	}
 
-  /**
-   * Mark as dead and available for garbage collection.
-   */
-  destroy() {
-    this.dead = true;
-  }
+	/**
+	 * Mark as dead and available for garbage collection.
+	 */
+	destroy() {
+		this.dead = true;
+	}
 
 	/**
 	 * Called upon cleaning up the object.
 	 */
 	reap() {
-		typeof this._reapCB === 'function' && this._reapCB();
+		typeof this._reapCB === "function" && this._reapCB();
 	}
 
 	tick() {

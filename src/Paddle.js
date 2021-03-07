@@ -86,10 +86,12 @@ class Paddle extends Block {
 	destroy() {}
 
 	_handleMovement = () => {
+		const input = this._context.keyboard.inputMap;
+
 		/* Handle input */
-		if (this.input.right && this.input.left) {
+		if (input.ArrowRight && input.ArrowLeft) {
 			this.lastDirection = null;
-		} else if (this.input.right) {
+		} else if (input.ArrowRight) {
 			if (this.lastDirection === "right") {
 				this.speed += 1;
 			} else {
@@ -97,7 +99,7 @@ class Paddle extends Block {
 			}
 
 			this.lastDirection = "right";
-		} else if (this.input.left) {
+		} else if (input.ArrowLeft) {
 			if (this.lastDirection === "left") {
 				this.speed -= 1;
 			} else {
@@ -120,17 +122,17 @@ class Paddle extends Block {
 		let newX = this.speed + this.x;
 		if (newX < this.leftBounds) {
 			newX = this.leftBounds;
-			this.audio.playTrill(5);
+			this._context.audio.playTrill(5);
 		} else if (newX > this.rightBounds - this.width) {
 			newX = this.rightBounds - this.width;
-			this.audio.playTrill(5);
+			this._context.audio.playTrill(5);
 		}
 
 		this.x = newX;
 	};
 
 	_draw = () => {
-		this.video.drawBlock({
+		this._context.video.drawBlock({
 			x: this.x,
 			y: this.y,
 			width: this.width,
@@ -138,50 +140,6 @@ class Paddle extends Block {
 			color: this.color,
 			borderColor: this.borderColor,
 		});
-	};
-
-	/**
-	 * Fires the space lasers if available.
-	 */
-	pressFireSpaceLasers = () => {
-		this.input.fireSpaceLasers = true;
-	};
-
-	/**
-	 * Moves the paddle leftward.
-	 */
-	pressLeft = () => {
-		this.input.left = true;
-	};
-
-	/**
-	 * Moves the paddle rightward.
-	 */
-	pressRight = () => {
-		this.input.right = true;
-	};
-
-	/**
-	 * Stops firing the space lasers.
-	 */
-	releaseFireSpaceLasers = () => {
-		this.input.fireSpaceLasers = false;
-	};
-
-	/**
-	 * Stops moving the paddle left and resets speed.
-	 */
-	releaseLeft = () => {
-		this.input.left = false;
-		this.paddleSpeed = 0;
-	};
-
-	/**
-	 * Stops moving the paddle right and resets speed.
-	 */
-	releaseRight = () => {
-		this.input.right = false;
-		this.paddleSpeed = 0;
 	};
 
 	/**

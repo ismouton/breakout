@@ -13,7 +13,7 @@ class InputGrid extends Character {
 			["g", "h", "i", "j", "k", "l", "4", "5", "6"],
 			["m", "n", "o", "p", "q", "r", "7", "8", "9"],
 			["s", "t", "u", "v", "w", "x", "y", "z", "0"],
-			[  _,   _,   _,   _,   _,   _,   _, "{", "}"],
+			[_, _, _, _, _, _, _, "\b", "\0"],
 		];
 
 		this._cursor = {
@@ -27,12 +27,22 @@ class InputGrid extends Character {
 		this.objects = [
 			new Block({
 				context,
-				x, y,
+				x,
+				y,
 				width: totalColumns * 24 + 7,
 				height: totalRows * 24 + 7,
 				color: 0x990000,
-				borderColor: 0xFFFFFF,
-			})
+				borderColor: 0xffffff,
+			}),
+			new Block({
+				context,
+				x,
+				y: y - 20,
+				width: 8 * 7 - 1,
+				height: 14,
+				color: 0x990000,
+				borderColor: 0xffffff,
+			}),
 		];
 
 		for (let localY = 0; localY < this._grid.length; localY++) {
@@ -55,7 +65,7 @@ class InputGrid extends Character {
 						x: columnSpacing * localX + this.x + padding,
 						y: rowSpacing * localY + this.y + padding,
 						string: character,
-						color: 0xFFFFFF,
+						color: 0xffffff,
 					})
 				);
 			}
@@ -70,16 +80,16 @@ class InputGrid extends Character {
 		this._userInputTextBox = new TextBox({
 			context,
 			scale: 1,
-			x: this.x,
+			x: this.x + 4,
 			y: this.y - 16,
-			color: 0xFFFFFF,
+			color: 0xffffff,
 		});
 
 		this._userInput = [];
 	}
 
 	_handleInput() {
-		const inputMap = this._context.inputMap;
+		const inputMap = this._context.keyboard.inputMap;
 
 		const { row, column } = this._cursor;
 
@@ -87,39 +97,45 @@ class InputGrid extends Character {
 		if (inputMap.Enter) {
 			const character = this._grid[row][column];
 
-			this._userInput.push(character);
-
-			console.log(this._userInput.join(''));
-
-			delete inputMap.Enter;
+			if (character === "\0") {
+				this.destroy();
+			} else if (character === "\b") {
+				this._userInput.pop();
+			} else if (this._userInput.length < 6) {
+				this._userInput.push(character);
+			}
 		}
-		
-		if (this._cursor.row === 4) {
 
+		if (
+			this._cursor.row === 3 &&
+			inputMap.ArrowDown &&
+			this._cursor.column === 8
+		) {
+			this._cursor.column = 8;
+			this._cursor.row = 4;
+		} else if (this._cursor.row === 3 && inputMap.ArrowDown) {
+			this._cursor.column = 7;
+			this._cursor.row = 4;
 		} else if (inputMap.ArrowUp && this._cursor.row > 0) {
 			this._cursor.row -= 1;
-
-			delete inputMap.ArrowUp;
-		} else if (inputMap.ArrowDown  && this._cursor.row < 3) {
+		} else if (inputMap.ArrowDown && this._cursor.row < 3) {
 			this._cursor.row += 1;
-
-			delete inputMap.ArrowDown;
-		} else if (inputMap.ArrowLeft && this._cursor.column > 0) {
+		} else if (
+			inputMap.ArrowLeft &&
+			this._cursor.column > 0 &&
+			!(this._cursor.column === 7 && this._cursor.row === 4)
+		) {
 			this._cursor.column -= 1;
-
-			delete inputMap.ArrowLeft;
 		} else if (inputMap.ArrowRight && this._cursor.column < 8) {
 			this._cursor.column += 1;
-
-			delete inputMap.ArrowRight;
 		}
 
-		this._selectionBracket.x = (this._cursor.column * 24) + 14 + this.x;
-		this._selectionBracket.y = (this._cursor.row * 24) + 15 + this.y;
-	};
+		this._selectionBracket.x = this._cursor.column * 24 + 14 + this.x;
+		this._selectionBracket.y = this._cursor.row * 24 + 15 + this.y;
+	}
 
 	_draw() {
-		this._userInputTextBox.setString(this._userInput.join(''));
+		this._userInputTextBox.setString(this._userInput.join(""));
 		this.objects.forEach((o) => o.tick());
 
 		this._selectionBracket.tick();
