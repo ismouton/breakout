@@ -1,1 +1,1 @@
-export const getTimestamp = () => new Date().getMilliseconds();
+export const getTimestamp = () => Date.now();

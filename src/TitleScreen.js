@@ -1,4 +1,5 @@
 import Character from "./Character";
+import MouseInteractive from "./MouseInteractive";
 import TextBox from "./Text";
 
 class TitleScreen extends Character {
@@ -52,7 +53,8 @@ class TitleScreen extends Character {
 				x: 8 * 27,
 				y: 8 * 29,
 				string: `2021 ismouton`,
-			})
+			}),
+			new MouseInteractive({ context, x: 150, y: 150 })
 		);
 	}
 
