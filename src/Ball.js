@@ -18,6 +18,7 @@ const createEdgesFromBounds = (bounds) => {
 }
 
 class Ball extends Block {
+	name = 'Ball';
 	constructor({
 		/**
 		 * The width and height of the ball.
@@ -195,6 +196,10 @@ class Ball extends Block {
 
 		this.x = newX;
 		this.y = newY;
+
+		if (this.y > 256) {
+			this.dead = true;
+		}
 	}
 
 	_tick() {

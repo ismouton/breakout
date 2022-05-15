@@ -3,28 +3,8 @@ import TextBox from "./Text";
 
 class HighScore extends Character {
 	constructor({
-		highScoresList = [
-			// 1
-			["Name1", 119001],
-			// 2
-			["Name2", 32646],
-			// 3
-			["Name3", 7001],
-			// 4
-			["Name4", 6001],
-			// 5
-			["Name5", 5001],
-			// 6
-			["Name6", 4001],
-			// 7
-			["Name7", 3001],
-			// 8
-			["Name7", 2001],
-			// 9
-			["Name9", 1001],
-			// 10
-			["Name10", 1],
-		],
+		context,
+		highScoresList,
 	}) {
 		super(...arguments);
 
@@ -51,36 +31,32 @@ class HighScore extends Character {
 
 		this.objects.push(
 			new TextBox({
+				context,
 				scale: 1,
-				audio: this.audio,
-				video: this.video,
 				x: 8 * rankColumn + this.x,
 				y: 8 * headerRow + this.y,
 				string: `Rank`,
 				color: 0xff0000,
 			}),
 			new TextBox({
+				context,
 				scale: 1,
-				audio: this.audio,
-				video: this.video,
 				x: 8 * nameColumn + this.x,
 				y: 8 * headerRow + this.y,
 				string: `Name`,
 				color: 0xff0000,
 			}),
 			new TextBox({
+				context,
 				scale: 1,
-				audio: this.audio,
-				video: this.video,
 				x: 8 * scoreColumn + this.x,
 				y: 8 * headerRow + this.y,
 				string: `Score`,
 				color: 0xff0000,
 			}),
 			new TextBox({
+				context,
 				scale: 1,
-				audio: this.audio,
-				video: this.video,
 				x: 8 * 13 + this.x,
 				y: 8 * 1 + this.y,
 				string: `- High Scores -`,
@@ -105,27 +81,23 @@ class HighScore extends Character {
 
 			this.objects.push(
 				new TextBox({
-					scale: 1,
-					audio: this.audio,
-					video: this.video,
+					context,
 					x: 8 * rankColumn + this.x,
 					y: row + 8 * headerRow + this.y,
 					string: ranks[i],
 					color: 0xffffff,
 				}),
 				new TextBox({
+					context,
 					scale: 1,
-					audio: this.audio,
-					video: this.video,
 					x: 8 * scoreColumn + this.x,
 					y: row + 8 * headerRow + this.y,
 					string: scorePadding + scoreString,
 					color: 0xffff33,
 				}),
 				new TextBox({
+					context,
 					scale: 1,
-					audio: this.audio,
-					video: this.video,
 					x: 8 * nameColumn + this.x,
 					y: row + 8 * headerRow + this.y,
 					string: score[0],

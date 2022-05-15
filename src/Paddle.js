@@ -86,12 +86,14 @@ class Paddle extends Block {
 	destroy() {}
 
 	_handleMovement = () => {
-		const input = this._context.keyboard.inputMap;
+		const inputMap = this._context.keyboard.inputMap;
+		const { ArrowLeft, ArrowRight } = inputMap;
 
 		/* Handle input */
-		if (input.ArrowRight && input.ArrowLeft) {
+		if (ArrowRight && ArrowLeft) {
 			this.lastDirection = null;
-		} else if (input.ArrowRight) {
+		} else if (ArrowRight) {
+
 			if (this.lastDirection === "right") {
 				this.speed += 1;
 			} else {
@@ -99,7 +101,7 @@ class Paddle extends Block {
 			}
 
 			this.lastDirection = "right";
-		} else if (input.ArrowLeft) {
+		} else if (ArrowLeft) {
 			if (this.lastDirection === "left") {
 				this.speed -= 1;
 			} else {
@@ -108,6 +110,7 @@ class Paddle extends Block {
 
 			this.lastDirection = "left";
 		} else {
+			// console.log('no dir')
 			this.speed = 0;
 		}
 

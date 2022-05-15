@@ -2,12 +2,14 @@ import Block from "./Block";
 import Character from "./Character";
 import SelectionBracket from "./SelectionBracket";
 import TextBox from "./Text";
+import { noop } from "./utils";
 
 const _ = null;
 class InputGrid extends Character {
-	constructor({ context, x, y }) {
+	constructor({ context, x, y, onEnd = noop }) {
 		super(...arguments);
-
+		context.keyboard.setMomentaryMode();
+		this._onEnd = onEnd;
 		this._grid = [
 			["a", "b", "c", "d", "e", "f", "1", "2", "3"],
 			["g", "h", "i", "j", "k", "l", "4", "5", "6"],
@@ -38,10 +40,18 @@ class InputGrid extends Character {
 				context,
 				x,
 				y: y - 20,
-				width: 8 * 7 - 1,
+				width: 32 * 7 - 1,
 				height: 14,
 				color: 0x990000,
 				borderColor: 0xffffff,
+			}),
+			new TextBox({
+				context,
+				scale: 1,
+				x: 48,
+				y: 48,
+				string: 'New high score!',
+				color: 0xffffff,
 			}),
 		];
 
@@ -66,7 +76,7 @@ class InputGrid extends Character {
 						y: rowSpacing * localY + this.y + padding,
 						string: character,
 						color: 0xffffff,
-					})
+					}),
 				);
 			}
 		}
@@ -98,35 +108,38 @@ class InputGrid extends Character {
 			const character = this._grid[row][column];
 
 			if (character === "\0") {
+				this._onEnd(this._userInput.join(''));
 				this.destroy();
 			} else if (character === "\b") {
 				this._userInput.pop();
-			} else if (this._userInput.length < 6) {
+			} else if (this._userInput.length < 27) {
 				this._userInput.push(character);
 			}
 		}
 
+		const { ArrowDown, ArrowLeft, ArrowUp, ArrowRight } = inputMap;
+
 		if (
 			this._cursor.row === 3 &&
-			inputMap.ArrowDown &&
+			ArrowDown &&
 			this._cursor.column === 8
 		) {
 			this._cursor.column = 8;
 			this._cursor.row = 4;
-		} else if (this._cursor.row === 3 && inputMap.ArrowDown) {
+		} else if (this._cursor.row === 3 && ArrowDown) {
 			this._cursor.column = 7;
 			this._cursor.row = 4;
-		} else if (inputMap.ArrowUp && this._cursor.row > 0) {
+		} else if (ArrowUp && this._cursor.row > 0) {
 			this._cursor.row -= 1;
-		} else if (inputMap.ArrowDown && this._cursor.row < 3) {
+		} else if (ArrowDown && this._cursor.row < 3) {
 			this._cursor.row += 1;
 		} else if (
-			inputMap.ArrowLeft &&
+			ArrowLeft &&
 			this._cursor.column > 0 &&
 			!(this._cursor.column === 7 && this._cursor.row === 4)
 		) {
 			this._cursor.column -= 1;
-		} else if (inputMap.ArrowRight && this._cursor.column < 8) {
+		} else if (ArrowRight && this._cursor.column < 8) {
 			this._cursor.column += 1;
 		}
 

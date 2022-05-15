@@ -1,4 +1,4 @@
-import { getTimestamp } from "../utils";
+import { getTimestamp, noop } from "../utils";
 
 class Mouse {
 	constructor({ canvas, video }) {
@@ -86,7 +86,7 @@ class Mouse {
 		const x = Math.floor((clientX - this._canvasOffset.x) / this._video.scale);
 		const y = Math.floor((clientY - this._canvasOffset.y) / this._video.scale);
 
-		return { x, y };
+		return { x: Math.max(x, 0), y: Math.max(y, 0) };
 	}
 
 	_setCanvasOffset = () => {

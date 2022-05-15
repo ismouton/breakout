@@ -1,3 +1,5 @@
+import { noop } from "./utils";
+
 const classCounterMap = {};
 class Character {
 	constructor({
@@ -24,11 +26,14 @@ class Character {
 		 * How long this object will live until it destroys itself.
 		 */
 		lifeCycleInTicks,
+
+		onEachCycle = noop,
 	} = {}) {
 		this._context = context;
 		this._x = x;
 		this._y = y;
 
+		this.reaped = false;
 		const name = this.constructor.name;
 
 		if (classCounterMap[name] === undefined) {
@@ -40,6 +45,7 @@ class Character {
 		this._cycleCount = 1;
 		this._reapCB = onReap;
 		this._lifeCycleInTicks = lifeCycleInTicks;
+		this._onEachCycle = onEachCycle;
 	}
 
 	set x(value) {
@@ -69,10 +75,17 @@ class Character {
 	 * Called upon cleaning up the object.
 	 */
 	reap() {
+		if (this.reaped) {
+			return;
+		}
+
 		typeof this._reapCB === "function" && this._reapCB();
+
+		this.reaped = true;
 	}
 
 	tick() {
+		this._onEachCycle(this);
 		this._tick();
 		if (this._lifeCycleInTicks <= this._cycleCount) {
 			this.destroy();
